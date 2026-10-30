@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Sentiment Analysis Microservice deployed on AWS Serverless Infrastructure
+
+Globals:
+  Function:
+    Timeout: 15
+    MemorySize: 512
+    Runtime: python3.12
+    Architectures:
+      - arm64
+    Environment:
+      Variables:
+        DYNAMODB_TABLE: !Ref SentimentLogsTable
+
+Resources:
+  # AWS API Gateway
+  SentimentApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowMethods: "'POST,GET,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+        AllowOrigin: "'*'"
+      Throttle:
+        BurstLimit: 5000
+        RateLimit: 10000
+
+  # AWS Lambda Compute Function
+  SentimentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: lambda_function.lambda_handler
+      Description: Core sentiment analysis Lambda function with Amazon Comprehend integration
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - comprehend:DetectSentiment
+                - comprehend:DetectKeyPhrases
+                - comprehend:DetectEntities
+              Resource: '*'
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SentimentLogsTable
+      Events:
+        AnalyzeApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SentimentApi
+            Path: /api/v1/analyze
+            Method: POST
+        HealthCheckApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SentimentApi
+            Path: /api/v1/health
+            Method: GET
+
+  # Amazon DynamoDB Log Storage
+  SentimentLogsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: SentimentLogs
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+Outputs:
+  SentimentApiEndpoint:
+    Description: "AWS API Gateway prod endpoint URL for Sentiment Microservice"
+    Value: !Sub "https://${SentimentApi}.execute-api.${AWS::Region}.amazonaws.com/prod/api/v1/analyze"
+
+  SentimentFunctionArn:
+    Description: "AWS Lambda Function ARN"
+    Value: !GetAtt SentimentFunction.Arn

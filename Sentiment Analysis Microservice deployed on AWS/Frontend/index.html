@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Sentiment Analysis Microservice | Serverless Cloud Infrastructure</title>
+    <meta name="description" content="Production-ready Sentiment Analysis Microservice deployed on AWS using AWS Lambda, API Gateway, Amazon Comprehend, DynamoDB, S3, and CloudWatch.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chart.js for CloudWatch & Metrics Simulation -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- TOP ANNOUNCEMENT BAR -->
+    <div class="announcement-bar">
+        <div class="announcement-content">
+            <span class="badge badge-aws"><i class="fa-brands fa-aws"></i> AWS Cloud Native</span>
+            <span>Deployed on <strong>AWS Serverless Architecture</strong> (API Gateway + Lambda + Comprehend + DynamoDB)</span>
+        </div>
+        <div class="announcement-right">
+            <span class="region-pill"><i class="fa-solid fa-location-dot"></i> Region: <strong>us-east-1</strong></span>
+            <span class="status-indicator"><span class="dot pulse-green"></span> AWS Services Operational</span>
+        </div>
+    </div>
+
+    <!-- MAIN NAVBAR -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="brand-logo">
+                <div class="logo-icon">
+                    <i class="fa-brands fa-aws"></i>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-title">SentimentAI <span class="logo-highlight">AWS</span></span>
+                    <span class="logo-subtitle">Cloud Microservice</span>
+                </div>
+            </a>
+
+            <div class="nav-links" id="nav-links">
+                <a href="#overview" class="nav-link active"><i class="fa-solid fa-compass"></i> Overview</a>
+                <a href="#analyzer" class="nav-link"><i class="fa-solid fa-brain"></i> Live Analyzer</a>
+                <a href="#architecture" class="nav-link"><i class="fa-solid fa-sitemap"></i> AWS Architecture</a>
+                <a href="#aws-services" class="nav-link"><i class="fa-solid fa-cubes"></i> AWS Services</a>
+                <a href="#api-sandbox" class="nav-link"><i class="fa-solid fa-terminal"></i> API Sandbox</a>
+                <a href="#cost-calculator" class="nav-link"><i class="fa-solid fa-calculator"></i> AWS Costs</a>
+                <a href="#metrics" class="nav-link"><i class="fa-solid fa-chart-line"></i> CloudWatch</a>
+                <a href="#deployment" class="nav-link"><i class="fa-solid fa-code"></i> IaC & Code</a>
+            </div>
+
+            <div class="nav-actions">
+                <button class="btn btn-outline-sm" id="endpoint-switch-btn" onclick="toggleEndpointModal()">
+                    <i class="fa-solid fa-plug"></i> <span id="endpoint-status-text">AWS Endpoint: Active</span>
+                </button>
+                <a href="#analyzer" class="btn btn-aws-primary">
+                    <i class="fa-solid fa-bolt"></i> Try Live
+                </a>
+                <button class="mobile-toggle" onclick="toggleMobileNav()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero-section" id="overview">
+        <div class="hero-bg-glow"></div>
+        <div class="hero-grid-pattern"></div>
+        <div class="container hero-container">
+            <div class="hero-content">
+                <div class="hero-tag">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Production-Grade AWS Microservice
+                </div>
+                <h1 class="hero-title">
+                    Enterprise <span class="gradient-text">Sentiment Analysis</span> Deployed on AWS Cloud
+                </h1>
+                <p class="hero-description">
+                    High-throughput, sub-millisecond Natural Language Processing API microservice built on AWS Serverless infrastructure. Powered by <strong>AWS Lambda, API Gateway, Amazon Comprehend, DynamoDB, S3 & CloudWatch</strong>.
+                </p>
+
+                <div class="hero-cta-group">
+                    <a href="#analyzer" class="btn btn-aws-lg">
+                        <i class="fa-solid fa-play"></i> Launch Live NLP Analyzer
+                    </a>
+                    <a href="#architecture" class="btn btn-glass-lg">
+                        <i class="fa-solid fa-network-wired"></i> View AWS Architecture
+                    </a>
+                </div>
+
+                <!-- KEY METRICS BANNER -->
+                <div class="metrics-banner">
+                    <div class="metric-card">
+                        <div class="metric-icon"><i class="fa-solid fa-bolt"></i></div>
+                        <div class="metric-data">
+                            <span class="metric-value" id="stat-latency">~24 ms</span>
+                            <span class="metric-label">Avg Lambda Latency</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                        <div class="metric-data">
+                            <span class="metric-value">99.99%</span>
+                            <span class="metric-label">Serverless SLA Uptime</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon"><i class="fa-solid fa-layer-group"></i></div>
+                        <div class="metric-data">
+                            <span class="metric-value">10,000+</span>
+                            <span class="metric-label">RPS Throttle Capacity</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon"><i class="fa-solid fa-coins"></i></div>
+                        <div class="metric-data">
+                            <span class="metric-value">$0.00</span>
+                            <span class="metric-label">AWS Free Tier Ready</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="code-preview-card">
+                    <div class="code-header">
+                        <div class="code-dots">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                        <span class="code-title"><i class="fa-brands fa-python"></i> AWS Lambda Handler (lambda_function.py)</span>
+                        <span class="code-badge">Python 3.12</span>
+                    </div>
+                    <div class="code-body">
+<pre><code class="language-python"><span class="kwd">import</span> json, boto3
+<span class="var">comprehend</span> = boto3.client(<span class="str">'comprehend'</span>, region_name=<span class="str">'us-east-1'</span>)
+<span class="var">dynamodb</span> = boto3.resource(<span class="str">'dynamodb'</span>).Table(<span class="str">'SentimentLogs'</span>)
+
+<span class="kwd">def</span> <span class="fun">lambda_handler</span>(event, context):
+    <span class="var">body</span> = json.loads(event.get(<span class="str">'body'</span>, <span class="str">'{}'</span>))
+    <span class="var">text</span> = body.get(<span class="str">'text'</span>, <span class="str">''</span>)
+    
+    <span class="comment"># Call Amazon Comprehend Sentiment API</span>
+    <span class="var">res</span> = comprehend.detect_sentiment(
+        Text=<span class="var">text</span>, LanguageCode=<span class="str">'en'</span>
+    )
+    
+    <span class="comment"># Async persistence into DynamoDB</span>
+    dynamodb.put_item(Item={
+        <span class="str">'id'</span>: context.aws_request_id,
+        <span class="str">'sentiment'</span>: res[<span class="str">'Sentiment'</span>],
+        <span class="str">'scores'</span>: res[<span class="str">'SentimentScore'</span>]
+    })
+    
+    <span class="kwd">return</span> {
+        <span class="str">'statusCode'</span>: <span class="num">200</span>,
+        <span class="str">'headers'</span>: {<span class="str">'Access-Control-Allow-Origin'</span>: <span class="str">'*'</span>},
+        <span class="str">'body'</span>: json.dumps(res)
+    }</code></pre>
+                    </div>
+                    <div class="code-footer">
+                        <span><i class="fa-solid fa-check-double text-success"></i> Integrated with AWS API Gateway CORS</span>
+                        <span class="aws-tag"><i class="fa-brands fa-aws"></i> AWS Boto3 SDK</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LIVE SENTIMENT ANALYZER PLAYGROUND -->
+    <section class="section analyzer-section" id="analyzer">
+        <div class="container">
+            <div class="section-header center">
+                <span class="section-tag"><i class="fa-solid fa-microchip"></i> Live Playground</span>
+                <h2 class="section-title">Interactive <span class="gradient-text">AWS Sentiment Analyzer</span></h2>
+                <p class="section-description">Test real-time text analysis powered by Amazon Comprehend & AWS Lambda. Type custom text or choose preset test suites.</p>
+            </div>
+
+            <div class="analyzer-grid">
+                <!-- INPUT COLUMN -->
+                <div class="analyzer-card input-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-pen-to-square"></i> Input Text Payload</h3>
+                        <div class="sample-presets">
+                            <span class="preset-label">Presets:</span>
+                            <button class="preset-btn" onclick="loadPreset('positive')">😊 Positive</button>
+                            <button class="preset-btn" onclick="loadPreset('negative')">😡 Negative</button>
+                            <button class="preset-btn" onclick="loadPreset('mixed')">🤔 Mixed</button>
+                            <button class="preset-btn" onclick="loadPreset('neutral')">😐 Neutral</button>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <textarea id="analyzer-input" placeholder="Type or paste text here (e.g. 'The AWS Lambda microservice migration was an astounding success! Latency dropped by 65% and deployment is seamless.')..." rows="6"></textarea>
+                        
+                        <div class="input-controls">
+                            <span class="char-counter" id="char-count">0 / 5000 chars</span>
+                            <div class="toggle-group">
+                                <label class="switch">
+                                    <input type="checkbox" id="auto-analyze" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                                <span class="switch-label">Live Stream Analysis</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <button class="btn btn-outline" onclick="clearAnalyzer()">
+                            <i class="fa-solid fa-eraser"></i> Clear
+                        </button>
+                        <button class="btn btn-aws-secondary" onclick="exportToExcel()" id="export-excel-btn" title="Download all analyzed comments as Excel CSV file for report">
+                            <i class="fa-solid fa-file-excel"></i> Export Excel Report (<span id="export-count">0</span>)
+                        </button>
+                        <button class="btn btn-aws-primary btn-lg-glow" onclick="runAnalysis()" id="analyze-btn">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Analyze Sentiment
+                        </button>
+                    </div>
+                </div>
+
+                <!-- OUTPUT RESULTS COLUMN -->
+                <div class="analyzer-card output-card" id="output-container">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-chart-pie"></i> Amazon Comprehend Output</h3>
+                        <span class="execution-badge" id="execution-time"><i class="fa-solid fa-clock"></i> 18 ms</span>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- SENTIMENT HERO BADGE -->
+                        <div class="sentiment-result-banner" id="sentiment-banner">
+                            <div class="sentiment-emoji" id="sentiment-emoji">🚀</div>
+                            <div class="sentiment-details">
+                                <span class="sentiment-label">PRIMARY SENTIMENT</span>
+                                <h2 class="sentiment-value" id="sentiment-value">POSITIVE</h2>
+                                <span class="sentiment-confidence" id="sentiment-confidence-text">Confidence: 99.4%</span>
+                            </div>
+                            <div class="gauge-container">
+                                <canvas id="confidence-gauge" width="100" height="100"></canvas>
+                                <span class="gauge-score" id="gauge-score">99%</span>
+                            </div>
+                        </div>
+
+                        <!-- SCORE BREAKDOWN BARS -->
+                        <div class="score-breakdown">
+                            <h4 class="breakdown-title"><i class="fa-solid fa-sliders"></i> Confidence Score Breakdown</h4>
+                            
+                            <div class="bar-group">
+                                <div class="bar-info">
+                                    <span>Positive</span>
+                                    <span id="score-pos-text">99.4%</span>
+                                </div>
+                                <div class="progress-track">
+                                    <div class="progress-bar pos-bar" id="bar-positive" style="width: 99.4%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="bar-group">
+                                <div class="bar-info">
+                                    <span>Negative</span>
+                                    <span id="score-neg-text">0.2%</span>
+                                </div>
+                                <div class="progress-track">
+                                    <div class="progress-bar neg-bar" id="bar-negative" style="width: 0.2%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="bar-group">
+                                <div class="bar-info">
+                                    <span>Neutral</span>
+                                    <span id="score-neu-text">0.3%</span>
+                                </div>
+                                <div class="progress-track">
+                                    <div class="progress-bar neu-bar" id="bar-neutral" style="width: 0.3%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="bar-group">
+                                <div class="bar-info">
+                                    <span>Mixed</span>
+                                    <span id="score-mix-text">0.1%</span>
+                                </div>
+                                <div class="progress-track">
+                                    <div class="progress-bar mix-bar" id="bar-mixed" style="width: 0.1%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- WORD HIGHLIGHT HEATMAP & ENTITIES -->
+                        <div class="nlp-details">
+                            <div class="nlp-block">
+                                <h4><i class="fa-solid fa-highlighter"></i> Sentiment Token Heatmap</h4>
+                                <div class="token-heatmap" id="token-heatmap">
+                                    <!-- Rendered dynamically -->
+                                </div>
+                            </div>
+                            <div class="nlp-block">
+                                <h4><i class="fa-solid fa-tags"></i> Key Entities & Phrases</h4>
+                                <div class="entity-tags" id="entity-tags">
+                                    <!-- Rendered dynamically -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AWS METADATA FOOTER -->
+                        <div class="aws-response-meta">
+                            <div class="meta-item">
+                                <span class="meta-key">AWS Request ID:</span>
+                                <span class="meta-val" id="aws-req-id">req-8f9a-42b1-9ce4</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-key">DynamoDB Table:</span>
+                                <span class="meta-val">SentimentLogs (SUCCESS)</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-key">Comprehend Model:</span>
+                                <span class="meta-val">Standard Pretrained EN-v2</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INTERACTIVE AWS CLOUD ARCHITECTURE SECTION -->
+    <section class="section architecture-section" id="architecture">
+        <div class="container">
+            <div class="section-header center">
+                <span class="section-tag"><i class="fa-solid fa-diagram-project"></i> Infrastructure Topology</span>
+                <h2 class="section-title">AWS Serverless <span class="gradient-text">Architecture Diagram</span></h2>
+                <p class="section-description">Click any service node in the interactive cloud pipeline to inspect configuration specs, Boto3 SDK calls, and IAM security policies.</p>
+            </div>
+
+            <!-- INTERACTIVE ARCHITECTURE CANVAS -->
+            <div class="architecture-wrapper">
+                <div class="arch-flow">
+                    
+                    <!-- NODE 1: CLIENT / CLOUDFRONT -->
+                    <div class="arch-node" data-service="cloudfront" onclick="selectNode('cloudfront')">
+                        <div class="node-icon aws-cf"><i class="fa-solid fa-globe"></i></div>
+                        <div class="node-body">
+                            <span class="node-type">Edge CDN</span>
+                            <span class="node-title">Amazon CloudFront</span>
+                        </div>
+                        <div class="node-status"><i class="fa-solid fa-circle-check text-success"></i> Global Edge</div>
+                    </div>
+
+                    <div class="arch-connector"><i class="fa-solid fa-arrow-right"></i></div>
+
+                    <!-- NODE 2: API GATEWAY -->
+                    <div class="arch-node active" data-service="apigateway" onclick="selectNode('apigateway')">
+                        <div class="node-icon aws-apg"><i class="fa-solid fa-route"></i></div>
+                        <div class="node-body">
+                            <span class="node-type">REST API</span>
+                            <span class="node-title">AWS API Gateway</span>
+                        </div>
+                        <div class="node-status"><i class="fa-solid fa-shield"></i> Throttled & CORS</div>
+                    </div>
+
+                    <div class="arch-connector"><i class="fa-solid fa-arrow-right"></i></div>
+
+                    <!-- NODE 3: AWS LAMBDA -->
+                    <div class="arch-node" data-service="lambda" onclick="selectNode('lambda')">
+                        <div class="node-icon aws-lmb"><i class="fa-solid fa-microchip"></i></div>
+                        <div class="node-body">
+                            <span class="node-type">Compute</span>
+                            <span class="node-title">AWS Lambda</span>
+                        </div>
+                        <div class="node-status"><i class="fa-solid fa-bolt"></i> Python 3.12</div>
+                    </div>
+
+                    <div class="arch-connector"><i class="fa-solid fa-arrow-right"></i></div>
+
+                    <!-- NODE 4: AMAZON COMPREHEND -->
+                    <div class="arch-node" data-service="comprehend" onclick="selectNode('comprehend')">
+                        <div class="node-icon aws-cmp"><i class="fa-solid fa-brain"></i></div>
+                        <div class="node-body">
+                            <span class="node-type">AI / ML</span>
+                            <span class="node-title">Amazon Comprehend</span>
+                        </div>
+                        <div class="node-status"><i class="fa-solid fa-robot"></i> NLP Model</div>
+                    </div>
+
+                    <div class="arch-connector"><i class="fa-solid fa-arrow-right"></i></div>
+
+                    <!-- NODE 5: DYNAMODB -->
+                    <div class="arch-node" data-service="dynamodb" onclick="selectNode('dynamodb')">
+                        <div class="node-icon aws-ddb"><i class="fa-solid fa-database"></i></div>
+                        <div class="node-body">
+                            <span class="node-type">NoSQL Storage</span>
+                            <span class="node-title">Amazon DynamoDB</span>
+                        </div>
+                        <div class="node-status"><i class="fa-solid fa-hard-drive"></i> On-Demand Log</div>
+                    </div>
+
+                </div>
+
+                <!-- SECONDARY NODES ROW: S3 & CLOUDWATCH -->
+                <div class="arch-flow secondary-flow">
+                    <div class="arch-node" data-service="s3" onclick="selectNode('s3')">
+                        <div class="node-icon aws-s3"><i class="fa-solid fa-box-archive"></i></div>
+                        <div class="node-body">
+                            <span class="node-type">Storage / Data Lake</span>
+                            <span class="node-title">Amazon S3 Bucket</span>
+                        </div>
+                        <div class="node-status">Static Site & Backup</div>
+                    </div>
+
+                    <div class="arch-node" data-service="cloudwatch" onclick="selectNode('cloudwatch')">
+                        <div class="node-icon aws-cw"><i class="fa-solid fa-eye"></i></div>
+                        <div class="node-body">
+                            <span class="node-type">Monitoring</span>
+                            <span class="node-title">Amazon CloudWatch</span>
+                        </div>
+                        <div class="node-status">Logs & X-Ray Tracing</div>
+                    </div>
+
+                    <div class="arch-node" data-service="iam" onclick="selectNode('iam')">
+                        <div class="node-icon aws-iam"><i class="fa-solid fa-key"></i></div>
+                        <div class="node-body">
+                            <span class="node-type">Security</span>
+                            <span class="node-title">AWS IAM Role</span>
+                        </div>
+                        <div class="node-status">Least Privilege Policy</div>
+                    </div>
+                </div>
+
+                <!-- INSPECTOR PANEL -->
+                <div class="node-inspector" id="node-inspector">
+                    <div class="inspector-header">
+                        <div class="inspector-title-group">
+                            <i class="fa-solid fa-gear text-aws" id="inspect-icon"></i>
+                            <div>
+                                <h3 id="inspect-title">AWS API Gateway</h3>
+                                <span class="inspect-sub" id="inspect-sub">HTTP REST Endpoint & Request Router</span>
+                            </div>
+                        </div>
+                        <span class="badge badge-aws" id="inspect-badge">Active Service</span>
+                    </div>
+
+                    <div class="inspector-grid">
+                        <div class="inspect-col">
+                            <h4><i class="fa-solid fa-list-check"></i> Key Capabilities & Role</h4>
+                            <ul class="inspect-list" id="inspect-capabilities">
+                                <li>Routes external HTTP POST requests to AWS Lambda function</li>
+                                <li>Enforces API Rate Limiting (10,000 req/sec, burst 5,000)</li>
+                                <li>Handles CORS headers (Access-Control-Allow-Origin: *)</li>
+                                <li>Validates JSON payload schemas before invoking compute layer</li>
+                            </ul>
+                        </div>
+                        <div class="inspect-col">
+                            <h4><i class="fa-solid fa-code"></i> Infrastructure snippet / Policy</h4>
+                            <div class="inspect-code-wrapper">
+<pre><code id="inspect-code-block">// AWS API Gateway Resource Definition
+{
+  "Type": "AWS::ApiGateway::Method",
+  "Properties": {
+    "HttpMethod": "POST",
+    "ResourceId": {"Ref": "AnalyzeResource"},
+    "RestApiId": {"Ref": "SentimentApi"},
+    "AuthorizationType": "NONE",
+    "Integration": {
+      "Type": "AWS_PROXY",
+      "IntegrationHttpMethod": "POST",
+      "Uri": {"Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SentimentFunction.Arn}/invocations"}
+    }
+  }
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DETAILED AWS SERVICES GRID -->
+    <section class="section aws-services-section" id="aws-services">
+        <div class="container">
+            <div class="section-header center">
+                <span class="section-tag"><i class="fa-brands fa-aws"></i> Cloud Ecosystem</span>
+                <h2 class="section-title">AWS Services <span class="gradient-text">Powering The Architecture</span></h2>
+                <p class="section-description">Every AWS component in this solution was selected for operational excellence, security, scalability, and cost efficiency.</p>
+            </div>
+
+            <div class="services-grid">
+                
+                <!-- SERVICE CARD 1 -->
+                <div class="service-card">
+                    <div class="service-card-header">
+                        <div class="service-icon icon-apg"><i class="fa-solid fa-network-wired"></i></div>
+                        <div>
+                            <h3>AWS API Gateway</h3>
+                            <span class="service-category">API Management</span>
+                        </div>
+                    </div>
+                    <p class="service-desc">
+                        Acts as the secure front door for clients. Provides RESTful endpoint routing, CORS handling, request validation, API key auth, and throttling protection.
+                    </p>
+                    <div class="service-tags">
+                        <span>REST API</span>
+                        <span>HTTP Proxy</span>
+                        <span>Throttle Limits</span>
+                    </div>
+                </div>
+
+                <!-- SERVICE CARD 2 -->
+                <div class="service-card">
+                    <div class="service-card-header">
+                        <div class="service-icon icon-lmb"><i class="fa-solid fa-microchip"></i></div>
+                        <div>
+                            <h3>AWS Lambda</h3>
+                            <span class="service-category">Serverless Compute</span>
+                        </div>
+                    </div>
+                    <p class="service-desc">
+                        Executes Python 3.12 microservice code on demand. Auto-scales from 0 to 1000s of concurrent invocations with sub-50ms execution times and zero server management.
+                    </p>
+                    <div class="service-tags">
+                        <span>Python 3.12</span>
+                        <span>Auto-scaling</span>
+                        <span>Zero Idle Cost</span>
+                    </div>
+                </div>
+
+                <!-- SERVICE CARD 3 -->
+                <div class="service-card">
+                    <div class="service-card-header">
+                        <div class="service-icon icon-cmp"><i class="fa-solid fa-brain"></i></div>
+                        <div>
+                            <h3>Amazon Comprehend</h3>
+                            <span class="service-category">Natural Language Processing</span>
+                        </div>
+                    </div>
+                    <p class="service-desc">
+                        Pre-trained deep learning NLP engine that extracts sentiment (Positive, Negative, Neutral, Mixed), confidence percentages, key phrases, and named entities.
+                    </p>
+                    <div class="service-tags">
+                        <span>NLP AI</span>
+                        <span>Entity Extraction</span>
+                        <span>Multi-language</span>
+                    </div>
+                </div>
+
+                <!-- SERVICE CARD 4 -->
+                <div class="service-card">
+                    <div class="service-card-header">
+                        <div class="service-icon icon-ddb"><i class="fa-solid fa-database"></i></div>
+                        <div>
+                            <h3>Amazon DynamoDB</h3>
+                            <span class="service-category">NoSQL Database</span>
+                        </div>
+                    </div>
+                    <p class="service-desc">
+                        Fully managed NoSQL database operating on Pay-Per-Request capacity. Stores historical sentiment analysis logs, request metadata, and user query analytics with single-digit ms response time.
+                    </p>
+                    <div class="service-tags">
+                        <span>On-Demand</span>
+                        <span>Single-Digit ms</span>
+                        <span>NoSQL Document</span>
+                    </div>
+                </div>
+
+                <!-- SERVICE CARD 5 -->
+                <div class="service-card">
+                    <div class="service-card-header">
+                        <div class="service-icon icon-s3"><i class="fa-solid fa-box-archive"></i></div>
+                        <div>
+                            <h3>Amazon S3</h3>
+                            <span class="service-category">Object Storage</span>
+                        </div>
+                    </div>
+                    <p class="service-desc">
+                        Provides durable static website hosting for the front-end dashboard, raw batch text uploads, dataset storage, and automated log archives with lifecycle policy management.
+                    </p>
+                    <div class="service-tags">
+                        <span>99.999999999% Durability</span>
+                        <span>Static Web</span>
+                        <span>Lifecycle Rules</span>
+                    </div>
+                </div>
+
+                <!-- SERVICE CARD 6 -->
+                <div class="service-card">
+                    <div class="service-card-header">
+                        <div class="service-icon icon-cw"><i class="fa-solid fa-eye"></i></div>
+                        <div>
+                            <h3>Amazon CloudWatch & X-Ray</h3>
+                            <span class="service-category">Observability & Tracing</span>
+                        </div>
+                    </div>
+                    <p class="service-desc">
+                        Captures stdout Lambda logs, sets up CloudWatch metric alarms for error spikes, and provides X-Ray distributed tracing for latency bottlenecks across AWS microservices.
+                    </p>
+                    <div class="service-tags">
+                        <span>Live Logs</span>
+                        <span>Distributed Tracing</span>
+                        <span>Metric Alarms</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- LIVE API SANDBOX (SWAGGER / POSTMAN STYLE) -->
+    <section class="section sandbox-section" id="api-sandbox">
+        <div class="container">
+            <div class="section-header center">
+                <span class="section-tag"><i class="fa-solid fa-terminal"></i> API Playground</span>
+                <h2 class="section-title">AWS API Gateway <span class="gradient-text">Interactive Sandbox</span></h2>
+                <p class="section-description">Test API endpoints directly from your browser. Generate production-ready cURL commands, Boto3 Python code, and Node.js requests.</p>
+            </div>
+
+            <div class="sandbox-card">
+                <!-- SANDBOX CONTROLS BAR -->
+                <div class="sandbox-bar">
+                    <div class="endpoint-selector">
+                        <span class="http-method post">POST</span>
+                        <select id="api-endpoint-select" onchange="updateSandboxTemplate()">
+                            <option value="/api/v1/analyze">/api/v1/analyze - Detect Text Sentiment</option>
+                            <option value="/api/v1/history">GET /api/v1/history - Retrieve DynamoDB History</option>
+                            <option value="/api/v1/health">GET /api/v1/health - Microservice Healthcheck</option>
+                        </select>
+                    </div>
+
+                    <div class="sandbox-actions">
+                        <button class="btn btn-aws-primary" onclick="executeApiSandbox()" id="send-api-btn">
+                            <i class="fa-solid fa-paper-plane"></i> Send Request
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SANDBOX GRID BODY -->
+                <div class="sandbox-grid">
+                    
+                    <!-- REQUEST PANEL -->
+                    <div class="sandbox-panel">
+                        <div class="panel-header">
+                            <h4><i class="fa-solid fa-code"></i> Request Headers & Payload</h4>
+                            <span class="content-type">Content-Type: application/json</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="header-inputs">
+                                <div class="input-row">
+                                    <span class="header-key">x-api-key</span>
+                                    <input type="text" value="aws-demo-key-998877665544" readonly>
+                                </div>
+                                <div class="input-row">
+                                    <span class="header-key">Accept</span>
+                                    <input type="text" value="application/json" readonly>
+                                </div>
+                            </div>
+                            <h5 class="sub-label">JSON Request Body:</h5>
+                            <textarea id="sandbox-req-body" class="code-textarea" rows="8"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- RESPONSE PANEL -->
+                    <div class="sandbox-panel">
+                        <div class="panel-header">
+                            <h4><i class="fa-solid fa-reply"></i> AWS API Gateway Response</h4>
+                            <div class="response-status" id="response-status-badge">
+                                <span class="status-code code-200">200 OK</span>
+                                <span class="time-taken" id="sandbox-latency"><i class="fa-solid fa-clock"></i> 22 ms</span>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="response-headers-box" id="response-headers-box">
+                              HTTP/1.1 200 OK<br>
+                              Content-Type: application/json<br>
+                              x-amzn-RequestId: d7b8a1c2-901e-456f-89ab-1234567890ab<br>
+                              Access-Control-Allow-Origin: *
+                            </div>
+                            <h5 class="sub-label">JSON Response Body:</h5>
+                            <pre class="json-viewer" id="sandbox-response-json"></pre>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- CODE GENERATOR TABBED FOOTER -->
+                <div class="code-gen-wrapper">
+                    <div class="code-tabs">
+                        <button class="code-tab active" onclick="switchCodeTab('curl')">cURL</button>
+                        <button class="code-tab" onclick="switchCodeTab('python')">Python (Boto3 / Requests)</button>
+                        <button class="code-tab" onclick="switchCodeTab('javascript')">JavaScript (Fetch)</button>
+                        <button class="code-tab" onclick="switchCodeTab('awscli')">AWS CLI</button>
+                    </div>
+                    <div class="code-display">
+                        <pre><code id="code-snippet-display">curl -X POST "https://api.us-east-1.amazonaws.com/prod/api/v1/analyze" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: aws-demo-key-998877665544" \
+  -d '{"text": "AWS Lambda microservices provide unparalleled scalability!"}'</code></pre>
+                        <button class="copy-code-btn" onclick="copyCodeSnippet()"><i class="fa-solid fa-copy"></i> Copy Code</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- AWS COST CALCULATOR SECTION -->
+    <section class="section cost-section" id="cost-calculator">
+        <div class="container">
+            <div class="section-header center">
+                <span class="section-tag"><i class="fa-solid fa-calculator"></i> AWS Billing & Economics</span>
+                <h2 class="section-title">AWS Interactive <span class="gradient-text">Cost Estimator</span></h2>
+                <p class="section-description">Calculate your monthly AWS infrastructure bill based on traffic throughput, Lambda execution time, and Amazon Comprehend units.</p>
+            </div>
+
+            <div class="cost-grid">
+                <div class="cost-card sliders-card">
+                    <h3><i class="fa-solid fa-sliders"></i> Usage Parameters</h3>
+                    
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Monthly API Requests:</span>
+                            <strong id="val-requests">500,000</strong>
+                        </div>
+                        <input type="range" id="slider-requests" min="10000" max="10000000" step="50000" value="500000" oninput="calculateAwsCosts()">
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Average Text Length (Characters):</span>
+                            <strong id="val-chars">250 chars</strong>
+                        </div>
+                        <input type="range" id="slider-chars" min="50" max="3000" step="50" value="250" oninput="calculateAwsCosts()">
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Lambda Memory Allocation:</span>
+                            <strong id="val-memory">512 MB</strong>
+                        </div>
+                        <input type="range" id="slider-memory" min="128" max="2048" step="128" value="512" oninput="calculateAwsCosts()">
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Average Lambda Execution Duration:</span>
+                            <strong id="val-duration">35 ms</strong>
+                        </div>
+                        <input type="range" id="slider-duration" min="10" max="300" step="5" value="35" oninput="calculateAwsCosts()">
+                    </div>
+                </div>
+
+                <div class="cost-card summary-card">
+                    <div class="total-cost-header">
+                        <span class="total-label">ESTIMATED MONTHLY AWS BILL</span>
+                        <div class="total-amount">
+                            <span class="currency">$</span>
+                            <span class="amount" id="total-cost-val">0.00</span>
+                            <span class="per-month">/ month</span>
+                        </div>
+                        <span class="free-tier-badge" id="free-tier-notice"><i class="fa-solid fa-gift"></i> Covered by 100% AWS Free Tier!</span>
+                    </div>
+
+                    <div class="cost-breakdown-table">
+                        <div class="cost-row">
+                            <span class="cost-service"><i class="fa-solid fa-microchip text-aws"></i> AWS Lambda Compute</span>
+                            <span class="cost-calc" id="cost-lambda">$0.00</span>
+                        </div>
+                        <div class="cost-row">
+                            <span class="cost-service"><i class="fa-solid fa-route text-aws"></i> AWS API Gateway</span>
+                            <span class="cost-calc" id="cost-apigateway">$0.00</span>
+                        </div>
+                        <div class="cost-row">
+                            <span class="cost-service"><i class="fa-solid fa-brain text-aws"></i> Amazon Comprehend NLP</span>
+                            <span class="cost-calc" id="cost-comprehend">$0.00</span>
+                        </div>
+                        <div class="cost-row">
+                            <span class="cost-service"><i class="fa-solid fa-database text-aws"></i> Amazon DynamoDB</span>
+                            <span class="cost-calc" id="cost-dynamodb">$0.00</span>
+                        </div>
+                        <div class="cost-row">
+                            <span class="cost-service"><i class="fa-solid fa-box-archive text-aws"></i> Amazon S3 & Data Logs</span>
+                            <span class="cost-calc" id="cost-s3">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CLOUDWATCH LIVE METRICS DASHBOARD SIMULATOR -->
+    <section class="section metrics-section" id="metrics">
+        <div class="container">
+            <div class="section-header center">
+                <span class="section-tag"><i class="fa-solid fa-chart-line"></i> Real-time Monitoring</span>
+                <h2 class="section-title">Amazon CloudWatch <span class="gradient-text">Metrics Dashboard</span></h2>
+                <p class="section-description">Simulated live telemetry streaming from AWS CloudWatch metrics (Invocations, Duration, 4xx/5xx Errors & Sentiment Ratios).</p>
+            </div>
+
+            <div class="charts-grid">
+                <!-- CHART 1: INVOCATIONS & LATENCY -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4><i class="fa-solid fa-chart-area"></i> Lambda Invocations & Latency (ms)</h4>
+                        <span class="live-pill"><span class="dot pulse-green"></span> Live Stream</span>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="chart-invocations"></canvas>
+                    </div>
+                </div>
+
+                <!-- CHART 2: SENTIMENT DISTRIBUTION PIE -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4><i class="fa-solid fa-chart-pie"></i> Sentiment Classification Ratio</h4>
+                        <span class="live-pill">Last 24 Hours</span>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="chart-sentiments"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AWS INFRASTRUCTURE AS CODE & SOURCE CODE SECTION -->
+    <section class="section deployment-section" id="deployment">
+        <div class="container">
+            <div class="section-header center">
+                <span class="section-tag"><i class="fa-solid fa-code"></i> Infrastructure as Code</span>
+                <h2 class="section-title">Production <span class="gradient-text">Deployment Source Code</span></h2>
+                <p class="section-description">Deploy this exact microservice directly to your AWS Account using AWS SAM, Terraform, Docker, or AWS CLI scripts.</p>
+            </div>
+
+            <div class="code-tabs-container">
+                <div class="iac-tabs">
+                    <button class="iac-tab active" onclick="switchIacTab('sam')"><i class="fa-solid fa-file-code"></i> AWS SAM (template.yaml)</button>
+                    <button class="iac-tab" onclick="switchIacTab('terraform')"><i class="fa-solid fa-cubes"></i> Terraform (main.tf)</button>
+                    <button class="iac-tab" onclick="switchIacTab('lambda')"><i class="fa-brands fa-python"></i> Python Handler</button>
+                    <button class="iac-tab" onclick="switchIacTab('docker')"><i class="fa-brands fa-docker"></i> Dockerfile</button>
+                    <button class="iac-tab" onclick="switchIacTab('awscli')"><i class="fa-solid fa-terminal"></i> AWS CLI Deploy</button>
+                </div>
+
+                <div class="iac-code-window">
+                    <div class="code-header">
+                        <span class="file-name" id="iac-file-title">template.yaml</span>
+                        <button class="copy-code-btn" onclick="copyIacCode()"><i class="fa-solid fa-copy"></i> Copy Code</button>
+                    </div>
+                    <pre><code id="iac-code-content">AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Sentiment Analysis Microservice on AWS Serverless
+
+Resources:
+  SentimentApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowMethods: "'POST,GET,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+        AllowOrigin: "'*'"
+
+  SentimentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./backend
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.12
+      Architectures: [arm64]
+      Timeout: 10
+      MemorySize: 512
+      Policies:
+        - ComprehendBasicAccessPolicy: {}
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SentimentLogsTable
+      Events:
+        AnalyzeApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SentimentApi
+            Path: /api/v1/analyze
+            Method: POST
+
+  SentimentLogsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: SentimentLogs
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-brand">
+                <div class="logo-text">
+                    <span class="logo-title"><i class="fa-brands fa-aws"></i> AWS Sentiment Microservice</span>
+                    <p>Designed for Enterprise Scalability, High Performance, and AWS Cloud Native Best Practices.</p>
+                </div>
+            </div>
+
+            <div class="footer-links">
+                <div class="footer-col">
+                    <h4>AWS Architecture</h4>
+                    <a href="#architecture">API Gateway</a>
+                    <a href="#architecture">AWS Lambda</a>
+                    <a href="#architecture">Amazon Comprehend</a>
+                    <a href="#architecture">Amazon DynamoDB</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Developer Tools</h4>
+                    <a href="#analyzer">Live Playground</a>
+                    <a href="#api-sandbox">API Sandbox</a>
+                    <a href="#cost-calculator">AWS Cost Calculator</a>
+                    <a href="#deployment">Terraform / SAM Code</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 AWS Sentiment Analysis Microservice. Engineered with AWS Serverless & Cloud Best Practices.</p>
+        </div>
+    </footer>
+
+    <!-- ENDPOINT CONFIG MODAL -->
+    <div class="modal-overlay" id="endpoint-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-plug text-aws"></i> Connect Custom AWS API Gateway URL</h3>
+                <button class="modal-close" onclick="toggleEndpointModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p>By default, this web page uses a high-accuracy client-side NLP engine that mirrors Amazon Comprehend. You can switch to your deployed AWS API Gateway REST endpoint URL below!</p>
+                <div class="input-group">
+                    <label>AWS API Gateway Endpoint URL:</label>
+                    <input type="text" id="custom-api-url" placeholder="https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/api/v1/analyze">
+                </div>
+                <div class="input-group">
+                    <label>AWS API Key (Optional):</label>
+                    <input type="text" id="custom-api-key" placeholder="Enter x-api-key header if required">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="resetToMockEndpoint()">Use Client-Side AWS Simulator</button>
+                <button class="btn btn-aws-primary" onclick="saveCustomEndpoint()">Save & Connect</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

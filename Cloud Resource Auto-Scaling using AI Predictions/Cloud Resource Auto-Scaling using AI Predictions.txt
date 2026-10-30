@@ -1,0 +1,41 @@
+================================================================================
+PROJECT TITLE: Cloud Resource Auto-Scaling using AI Predictions
+ENV / COST ASSURANCE: AWS Free Tier / Local Emulator (Guaranteed ₹0.00 / $0.00 Cost)
+================================================================================
+
+1. EXECUTIVE SUMMARY
+--------------------
+Cloud infrastructure auto-scaling traditionally relies on reactive policies (e.g., triggering scale-out only after CPU utilization exceeds 70% for 5 consecutive minutes). In modern web applications, reactive scaling causes severe service latency degradation and HTTP 503 errors because provisioning new cloud server instances takes several minutes (cold-start latency).
+
+This project implements a Proactive Cloud Resource Auto-Scaling System using Artificial Intelligence & Machine Learning Time-Series Forecasting. By training an ensemble ML model (RandomForest + Ridge Regression with temporal and rolling lag features), the system forecasts workload CPU demand and traffic spikes 15 to 30 minutes into the future. 
+
+When an imminent traffic surge is detected, the AI engine pre-warms cloud capacity ahead of time, ensuring that extra EC2 instances are fully operational before the surge arrives—all while maintaining a strict ₹0.00 (Zero-Cost) policy for AWS usage.
+
+2. ZERO-COST AWS ASSURANCE (₹0 GUARANTEE)
+------------------------------------------
+The system features a dedicated AWS Zero-Cost Protection Guard (`AWSZeroCostGuard` in `aws_controller.py`) that strictly enforces zero-cost operations:
+- Local AWS Emulator Mode (Default): Runs 100% locally with zero AWS charges and zero credentials required.
+- AWS Free Tier Live Integration Mode: Operates exclusively within AWS Free Tier quotas:
+  * AWS CloudWatch Custom Metrics (< 10 free metrics/month) under namespace `AIAutoScaling/ZeroCost`.
+  * AWS Lambda & DynamoDB Free Tier (1M requests/month free).
+  * Auto Scaling Group DryRun checks without provisioning paid EC2 instances or Application Load Balancers.
+  * Explicit blocking of paid services (NAT Gateways, ALBs, SageMaker Endpoints, or paid EC2 instances).
+
+3. CORE COMPONENT ARCHITECTURE
+-------------------------------
+- `ai_engine.py`: Machine Learning time-series prediction model (`WorkloadPredictor`) and proactive auto-scaler policy evaluator (`AutoScalerPolicy`).
+- `aws_controller.py`: AWS Boto3 integration client, AWS Zero-Cost Guard, and Local AWS EC2/ASG Simulator.
+- `server.py`: FastAPI REST API server handling real-time telemetry streaming, workload pattern simulation, and scaling strategy toggles.
+- `static/index.html`, `static/style.css`, `static/app.js`: Interactive futuristic glassmorphic Web Dashboard featuring Chart.js real-time graphing, active instance fleet node visualizer, traffic spike generator, and live event audit feed.
+- `run_app.py`: One-click startup script launching the Python backend server at http://localhost:8000 and opening the default browser.
+
+4. QUICK START INSTRUCTIONS
+----------------------------
+1. Open terminal in the project directory:
+   cd "e:\CC_project\Cloud Resource Auto-Scaling using AI Predictions"
+
+2. Start the application:
+   python run_app.py
+
+3. Access the web dashboard at:
+   http://localhost:8000
